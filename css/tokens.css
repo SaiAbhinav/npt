@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Design tokens — every color, font, radius and motion value lives here.
+   ========================================================================== */
+:root {
+  color-scheme: dark;
+
+  /* Type */
+  --font-display: "Unbounded", "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --display-weight: 700;          /* Unbounded is wide and heavy; 700 is plenty */
+  --display-tracking: -0.03em;
+
+  /* Palette — near-black graphite with a warm sunset accent */
+  --bg: #0f1012;
+  --surface: #18191c;
+  --surface-2: #232428;
+  --ink: #f2f2f3;
+  --ink-soft: #9b9ca4;
+  --ink-faint: #6c6d75;
+  --line: #2a2b30;
+  --primary: #f2f2f3;      /* main buttons: light on dark */
+  --on-primary: #111214;
+  --accent: #e8875a;       /* sunset orange */
+  --accent-2: #f2c14e;     /* golden yellow */
+  --tile-bg: #1d2a23;
+  --focus: #f2c14e;
+  --tile-hover-border: #8d8e96; /* subtle gray edge on hovered tiles */
+
+  /* Stamp ink reads like real ink on paper */
+  --stamp: #c4352c;
+  --stamp-paper: rgb(255 247 232 / 0.92);
+
+  /* Shape & depth */
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-lg: 0 40px 90px -30px rgb(0 0 0 / 0.85);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-spring: cubic-bezier(0.2, 1.4, 0.4, 1);
+
+  /* Geometry */
+  --hex-clip: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}

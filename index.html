@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>National Park Tracker</title>
+  <meta name="description" content="Track your visits to all 63 U.S. national parks on an interactive honeycomb map.">
+  <meta name="theme-color" content="#0f1012">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+
+  <!-- Web fonts (optional: the page falls back to system fonts when offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=DM+Mono:wght@500&display=swap">
+
+  <!-- Styles: design tokens first, then base, then one file per component -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components/header.css">
+  <link rel="stylesheet" href="css/components/controls.css">
+  <link rel="stylesheet" href="css/components/honeycomb.css">
+  <link rel="stylesheet" href="css/components/stamp.css">
+  <link rel="stylesheet" href="css/components/modal.css">
+
+  <!--
+    Scripts are classic deferred scripts that share one namespace (window.NPT).
+    ES modules are blocked on file:// URLs, so this keeps the code modular
+    while letting index.html open directly with no server.
+  -->
+  <script defer src="js/core/utils.js"></script>
+  <script defer src="js/data/parks.js"></script>
+  <script defer src="js/core/store.js"></script>
+  <script defer src="js/components/honeycomb.js"></script>
+  <script defer src="js/components/modal.js"></script>
+  <script defer src="js/components/search.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#parks">Skip to the parks</a>
+
+  <div class="page">
+    <header class="masthead">
+      <div class="masthead__top">
+        <div>
+          <p class="masthead__eyebrow" id="stats-line">63 parks · 30 states · 2 territories</p>
+          <h1 class="masthead__title">National Park Tracker</h1>
+        </div>
+        <p class="masthead__count">
+          <strong id="visited-count">0</strong>
+          <span>of <span id="total-count">63</span> visited</span>
+        </p>
+      </div>
+      <div class="progress" id="visited-bar" role="progressbar" aria-label="Parks visited" aria-valuemin="0" aria-valuemax="63" aria-valuenow="0">
+        <span class="progress__fill"></span>
+      </div>
+    </header>
+
+    <main>
+      <section class="toolbar" aria-label="Search and filter parks">
+        <div class="searchbar">
+          <label class="visually-hidden" for="park-search">Search parks by name, state or region</label>
+          <input class="searchbar__input" id="park-search" type="search" list="search-suggestions"
+                 placeholder="Search a park or state" autocomplete="off" spellcheck="false">
+          <button class="searchbar__clear" type="button" aria-label="Clear search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+          <fieldset class="segmented">
+            <legend class="visually-hidden">Show</legend>
+            <label><input type="radio" name="status" value="all"><span>All</span></label>
+            <label><input type="radio" name="status" value="visited" checked><span>Visited</span></label>
+          </fieldset>
+        </div>
+        <datalist id="search-suggestions"></datalist>
+        <p class="results" id="results" aria-live="polite"></p>
+      </section>
+
+      <section class="board" id="parks" aria-label="National parks">
+        <ul class="honeycomb" id="honeycomb" aria-label="National parks in U.S. states"></ul>
+
+        <section class="territories" aria-labelledby="territories-title">
+          <div class="territories__head">
+            <h2 id="territories-title">U.S. Territories</h2>
+            <span id="territories-count">2 parks</span>
+          </div>
+          <ul class="honeycomb" id="territories" aria-label="National parks in U.S. territories"></ul>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>Your visits are saved in this browser only. Park list and establishment years follow the National Park Service designations.</p>
+  </footer>
+
+  <!-- Park details dialog -->
+  <dialog class="park-dialog" id="park-dialog" aria-labelledby="park-title">
+    <article class="park-card">
+      <button class="park-card__close" type="button" data-action="close" aria-label="Close details">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+
+      <figure class="park-card__media">
+        <img class="park-card__img" data-field="image" src="images/placeholder.svg" alt="" width="800" height="600">
+        <span class="stamp stamp--modal" aria-hidden="true">
+          <span class="stamp__label">Visited</span>
+        </span>
+      </figure>
+
+      <div class="park-card__body">
+        <header>
+          <p class="eyebrow" data-field="region"></p>
+          <h2 class="park-card__title" id="park-title" data-field="name"></h2>
+          <p class="park-card__kind">National Park</p>
+        </header>
+
+        <dl class="facts">
+          <div class="fact">
+            <dt>Established</dt>
+            <dd><span class="fact__value" data-field="established"></span> <span class="fact__note" data-field="age"></span></dd>
+          </div>
+          <div class="fact">
+            <dt data-field="states-label">State</dt>
+            <dd><ul class="tags" data-field="states"></ul></dd>
+          </div>
+        </dl>
+
+        <button class="btn park-card__toggle" type="button" data-action="toggle">
+          <svg class="btn__icon btn__icon--mark" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+          <svg class="btn__icon btn__icon--unmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+          <span data-field="toggle-label">Mark as visited</span>
+        </button>
+
+        <nav class="pager" aria-label="Browse parks">
+          <button class="btn btn--ghost" type="button" data-action="prev"><span aria-hidden="true">←</span> Previous</button>
+          <span class="pager__pos" data-field="position"></span>
+          <button class="btn btn--ghost" type="button" data-action="next">Next <span aria-hidden="true">→</span></button>
+        </nav>
+      </div>
+    </article>
+  </dialog>
+</body>
+</html>

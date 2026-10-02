@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Stamp — the "VISITED" passport stamp shown on tiles and in the dialog.
+   ========================================================================== */
+.stamp {
+  --stamp-size: 1rem;
+  position: absolute;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3em;
+  padding: .62em 1em .55em;
+  font: var(--display-weight) var(--stamp-size)/1 var(--font-display);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--stamp);
+  background: var(--stamp-paper);
+  border: .14em solid currentColor;
+  border-radius: .45em;
+  outline: .07em solid currentColor;
+  outline-offset: -.4em;
+  rotate: -12deg;
+  box-shadow: 0 6px 16px -6px rgb(0 0 0 / .5);
+  pointer-events: none;
+  animation: stamp-in .5s var(--ease-spring) both;
+}
+
+/* Stamps only show once the park is visited */
+.hex-tile:not(.is-visited) .stamp,
+.park-card:not(.is-visited) .stamp { display: none; }
+
+/* On a tile: small, centered in the upper half of the hexagon */
+.stamp--tile {
+  --stamp-size: clamp(6.5px, calc(var(--tile-w) * 0.075), 11px);
+  top: 22%;
+  left: 50%;
+  translate: -50% 0;
+  padding: .55em .75em .5em;
+  letter-spacing: .1em;
+  outline-offset: -.36em;
+}
+
+/* In the dialog: big, sitting on the photo */
+.stamp--modal {
+  --stamp-size: clamp(1.1rem, .9rem + 1vw, 1.6rem);
+  right: 22px;
+  bottom: 26px;
+}
+
+@keyframes stamp-in {
+  0%   { opacity: 0; scale: 2.4; }
+  55%  { opacity: 1; scale: .9; }
+  100% { opacity: 1; scale: 1; }
+}

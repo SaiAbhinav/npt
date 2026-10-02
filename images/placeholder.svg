@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <title>Placeholder park landscape</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d49b"/>
+      <stop offset=".55" stop-color="#f2a96d"/>
+      <stop offset="1" stop-color="#e48a5c"/>
+    </linearGradient>
+    <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9a873"/>
+      <stop offset="1" stop-color="#7d5b5a"/>
+    </linearGradient>
+    <symbol id="pine" viewBox="0 0 40 100">
+      <path d="M20 0 34 32h-7l11 28h-9l11 30H23v10h-6V90H0l11-30H2l11-28H6Z"/>
+    </symbol>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#sky)"/>
+  <circle cx="560" cy="200" r="74" fill="#fbe6ae"/>
+  <circle cx="560" cy="200" r="110" fill="#fbe6ae" opacity=".25"/>
+
+  <g fill="none" stroke="#7a4a3a" stroke-width="3" stroke-linecap="round" opacity=".55">
+    <path d="M180 140q8-8 16 0q8-8 16 0"/>
+    <path d="M226 118q6-6 12 0q6-6 12 0"/>
+  </g>
+
+  <!-- far range -->
+  <path fill="#d4876a" d="M0 330 90 250l70 50 100-110 100 100 80-60 100 80 100-90 80 60 80-40v370H0Z"/>
+  <!-- mid range with snow -->
+  <path fill="#9a5546" d="M0 385 120 300l90 60 120-100 120 110 110-70 120 80 120-60v375H0Z"/>
+  <path fill="#f6e6d0" d="m330 260-34 28 18-3 16 13 14-12 20 7Z"/>
+  <path fill="#f6e6d0" d="m120 300-26 19 15-2 11 9 10-8 14 4Z"/>
+  <!-- lake -->
+  <rect y="440" width="800" height="60" fill="url(#lake)"/>
+  <g stroke="#fbe6ae" stroke-width="3" stroke-linecap="round" opacity=".6">
+    <path d="M520 455h80M540 468h40M500 482h120"/>
+  </g>
+  <!-- hills -->
+  <path fill="#3d5b49" d="M0 455q160-50 320-15t260 0 220-10v170H0Z"/>
+  <path fill="#1f3a2e" d="M0 510q210-45 420-5t380-15v110H0Z"/>
+
+  <!-- trees -->
+  <g fill="#284636">
+    <use href="#pine" x="40" y="380" width="40" height="100"/>
+    <use href="#pine" x="88" y="400" width="32" height="80"/>
+    <use href="#pine" x="680" y="385" width="38" height="95"/>
+    <use href="#pine" x="724" y="405" width="30" height="75"/>
+  </g>
+  <g fill="#132a1f">
+    <use href="#pine" x="10" y="440" width="52" height="130"/>
+    <use href="#pine" x="64" y="470" width="40" height="100"/>
+    <use href="#pine" x="700" y="450" width="50" height="125"/>
+    <use href="#pine" x="752" y="475" width="38" height="95"/>
+    <use href="#pine" x="300" y="500" width="30" height="75"/>
+  </g>
+</svg>

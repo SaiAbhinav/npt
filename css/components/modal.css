@@ -1,0 +1,197 @@
+/* ==========================================================================
+   Park dialog — native <dialog> with photo, facts and the visit toggle.
+   ========================================================================== */
+.park-dialog {
+  width: min(920px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.park-dialog[open] { animation: dialog-in .4s var(--ease); }
+.park-dialog::backdrop {
+  background: rgb(10 18 14 / .6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.park-dialog[open]::backdrop { animation: fade-in .3s ease; }
+
+.park-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) {
+  .park-card { grid-template-columns: 1.08fr 1fr; }
+}
+
+/* ---------- Media ---------- */
+.park-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--tile-bg);
+}
+@media (min-width: 760px) {
+  .park-card__media { aspect-ratio: auto; min-height: 480px; }
+}
+.park-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter .35s ease;
+}
+/* While the large photo loads, the small one shows slightly softened */
+.park-card__img.is-loading { filter: blur(6px); }
+.park-card__caption {
+  position: absolute;
+  left: 16px; bottom: 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(10 18 14 / .55);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+.park-card__close {
+  position: absolute;
+  top: 14px; right: 14px;
+  z-index: 3;
+  display: grid; place-items: center;
+  width: 42px; height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(6px);
+  transition: transform .2s var(--ease), background-color .2s;
+}
+.park-card__close:hover { transform: rotate(90deg); }
+.park-card__close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+
+/* ---------- Body ---------- */
+.park-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 30px 28px 20px;
+}
+@media (min-width: 760px) {
+  .park-card__body { padding: 44px 34px 22px; }
+}
+
+.eyebrow {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.park-card__title {
+  margin-top: 6px;
+  font: var(--display-weight) clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem)/1.1 var(--font-display);
+  letter-spacing: var(--display-tracking);
+  text-wrap: balance;
+}
+.park-card__kind {
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.facts {
+  display: grid;
+  gap: 12px;
+}
+.fact {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+.fact dt {
+  margin-bottom: 6px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.fact__value { font: var(--display-weight) 1.4rem/1 var(--font-display); letter-spacing: var(--display-tracking); }
+.fact__note { color: var(--ink-soft); font-size: .9rem; margin-left: 4px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  font-weight: 600;
+}
+.tags abbr {
+  display: grid; place-items: center;
+  min-width: 26px; height: 22px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: .68rem;
+  letter-spacing: .04em;
+  text-decoration: none;
+}
+
+/* ---------- Visit toggle ---------- */
+.park-card__toggle {
+  width: 100%;
+  min-height: 52px;
+  font-size: 1rem;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.park-card__toggle:hover { background: color-mix(in srgb, var(--primary) 86%, var(--ink)); }
+.park-card .btn__icon--unmark { display: none; }
+
+.park-card.is-visited .park-card__toggle {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--ink) 25%, transparent);
+  color: var(--ink);
+}
+.park-card.is-visited .park-card__toggle:hover {
+  border-color: var(--stamp);
+  color: var(--stamp);
+}
+.park-card.is-visited .btn__icon--mark { display: none; }
+.park-card.is-visited .btn__icon--unmark { display: block; }
+
+/* ---------- Pager ---------- */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.pager .btn:disabled { opacity: .35; cursor: default; background: none; }
+.pager__pos {
+  font-size: .82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(18px) scale(.97); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}

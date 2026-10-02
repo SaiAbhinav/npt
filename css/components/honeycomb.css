@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Honeycomb — hexagonal park tiles.
+   Positions (--x, --y) and tile size (--tile-w, --tile-h) are set by
+   js/components/honeycomb.js; everything visual is handled here.
+   ========================================================================== */
+.board {
+  width: 100%;
+  margin-top: 28px;
+}
+
+.honeycomb {
+  position: relative;
+  margin: 0 auto;
+  width: var(--hc-w, 100%);
+  height: var(--hc-h, 600px);
+}
+
+.hex-tile {
+  position: absolute;
+  top: 0; left: 0;
+  width: var(--tile-w);
+  height: var(--tile-h);
+  transform: translate(var(--x), var(--y));
+  filter: drop-shadow(0 3px 4px rgb(15 25 20 / .22));
+  transition: transform .55s var(--ease), filter .25s;
+}
+.honeycomb:not(.is-ready) .hex-tile { transition: none; }
+.hex-tile:hover,
+.hex-tile:focus-within { z-index: 2; }
+
+/* Hexagon-shaped borders: clip-path clips real borders/outlines, so four
+   offset drop-shadows on the unclipped parent trace the edge instead.
+   (An opaque color keeps the overlapping shadows even.) */
+.hex-tile:hover {
+  filter:
+    drop-shadow(1.5px 0 0 var(--tile-hover-border)) drop-shadow(-1.5px 0 0 var(--tile-hover-border))
+    drop-shadow(0 1.5px 0 var(--tile-hover-border)) drop-shadow(0 -1.5px 0 var(--tile-hover-border))
+    drop-shadow(0 10px 14px rgb(0 0 0 / .45));
+}
+
+/* Keyboard focus: stronger, accent-colored version of the same edge */
+.hex-tile:has(.hex:focus-visible) {
+  filter:
+    drop-shadow(3px 0 0 var(--focus)) drop-shadow(-3px 0 0 var(--focus))
+    drop-shadow(0 3px 0 var(--focus)) drop-shadow(0 -3px 0 var(--focus));
+}
+
+.hex {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  clip-path: var(--hex-clip);
+  background: var(--tile-bg);
+  color: #fff;
+  overflow: hidden;
+  transition: transform .3s var(--ease), opacity .3s, filter .3s;
+  animation: tile-in .6s var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 12ms);
+}
+.hex:focus-visible { outline: none; }
+.hex-tile:hover .hex { transform: scale(1.1); }
+
+.hex__img,
+.hex__shade {
+  position: absolute;
+  inset: 0;
+}
+.hex__img {
+  background-size: cover;
+  background-position: center;
+  transition: transform .7s var(--ease);
+}
+.hex-tile:hover .hex__img { transform: scale(1.08); }
+.hex__shade {
+  background: linear-gradient(180deg,
+    rgb(10 22 16 / 0) 30%,
+    rgb(10 22 16 / .55) 52%,
+    rgb(10 22 16 / .85) 100%);
+}
+
+.hex__name {
+  position: absolute;
+  left: 13%; right: 13%;
+  top: 54%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-align: center;
+  font: 700 clamp(9px, calc(var(--tile-w) * 0.112), 16px)/1.12 var(--font-body);
+  letter-spacing: .01em;
+  text-wrap: balance;
+  text-shadow: 0 1px 3px rgb(0 0 0 / .6);
+}
+
+/* ---------- Row mode (territories): a simple centered row, same tile size ---------- */
+.honeycomb--row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  height: auto;
+}
+.honeycomb--row .hex-tile {
+  position: relative;
+  transform: none;
+}
+
+.territories {
+  margin-top: clamp(40px, 5vw, 64px);
+}
+.territories__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+  font: 500 clamp(.72rem, .68rem + .2vw, .82rem)/1.2 var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.territories__head::before,
+.territories__head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.territories__head h2 {
+  font: inherit;
+  color: var(--ink);
+}
+
+/* ---------- Unvisited parks sit back a little; hover brings them forward ---------- */
+.hex-tile:not(.is-visited) .hex__img {
+  filter: brightness(.68) saturate(.75);
+  transition: transform .7s var(--ease), filter .3s;
+}
+.hex-tile:not(.is-visited):hover .hex__img,
+.hex-tile:not(.is-visited):has(.hex:focus-visible) .hex__img { filter: none; }
+
+/* ---------- Filtering ---------- */
+.hex-tile.is-dimmed { filter: none; }
+.hex-tile.is-dimmed .hex {
+  opacity: .2;
+  filter: grayscale(1);
+}
+.hex-tile.is-dimmed:hover .hex { opacity: .55; }
+
+@keyframes tile-in {
+  from { opacity: 0; scale: .6; }
+}
