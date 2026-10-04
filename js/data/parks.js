@@ -99,6 +99,20 @@
     ['Zion', 1919, ['Utah'], 'Southwest'],
   ];
 
+  /* Visited parks come from data/visited.js (window.NPT_VISITED), by id or name. */
+  const visitedIds = new Set();
+  const visitedFileOk = Array.isArray(window.NPT_VISITED);
+  const listed = visitedFileOk ? window.NPT_VISITED : [];
+  if (!visitedFileOk) {
+    console.warn('data/visited.js did not load or is not a list; showing no parks as visited.');
+  }
+  const knownIds = new Set(RAW.map(([name]) => slugify(name)));
+  listed.forEach((entry) => {
+    const id = slugify(entry);
+    if (knownIds.has(id)) visitedIds.add(id);
+    else console.warn(`data/visited.js: "${entry}" doesn't match any park. Check the spelling against the ids in README.md.`);
+  });
+
   const parks = RAW
     .map(([name, established, states, region]) => {
       const id = slugify(name);
@@ -110,6 +124,7 @@
         states,
         codes,
         region,
+        visited: visitedIds.has(id),
         isTerritory: states.every((s) => TERRITORIES.has(s)),
         image: `${PHOTO_DIR}/${id}.jpg`,
         thumb: `${PHOTO_DIR}/${id}-sm.jpg`,
@@ -127,5 +142,6 @@
     stateCodes: STATE_CODES,
     isStateCode: (code) => stateCodeSet.has(String(code).toLowerCase()),
     placeholder: PLACEHOLDER,
+    visitedFileOk,
   });
 })(window.NPT = window.NPT || {});

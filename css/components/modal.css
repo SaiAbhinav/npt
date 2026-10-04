@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Park dialog — native <dialog> with photo, facts and the visit toggle.
+   Park dialog — native <dialog> with photo, facts and Previous / Next.
    ========================================================================== */
 .park-dialog {
   width: min(920px, calc(100% - 32px));
@@ -149,29 +149,6 @@
   letter-spacing: .04em;
   text-decoration: none;
 }
-
-/* ---------- Visit toggle ---------- */
-.park-card__toggle {
-  width: 100%;
-  min-height: 52px;
-  font-size: 1rem;
-  background: var(--primary);
-  color: var(--on-primary);
-}
-.park-card__toggle:hover { background: color-mix(in srgb, var(--primary) 86%, var(--ink)); }
-.park-card .btn__icon--unmark { display: none; }
-
-.park-card.is-visited .park-card__toggle {
-  background: transparent;
-  border-color: color-mix(in srgb, var(--ink) 25%, transparent);
-  color: var(--ink);
-}
-.park-card.is-visited .park-card__toggle:hover {
-  border-color: var(--stamp);
-  color: var(--stamp);
-}
-.park-card.is-visited .btn__icon--mark { display: none; }
-.park-card.is-visited .btn__icon--unmark { display: block; }
 
 /* ---------- Pager ---------- */
 .pager {

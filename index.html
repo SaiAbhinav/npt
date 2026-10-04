@@ -27,9 +27,9 @@
     ES modules are blocked on file:// URLs, so this keeps the code modular
     while letting index.html open directly with no server.
   -->
+  <script defer src="data/visited.js"></script>
   <script defer src="js/core/utils.js"></script>
   <script defer src="js/data/parks.js"></script>
-  <script defer src="js/core/store.js"></script>
   <script defer src="js/components/honeycomb.js"></script>
   <script defer src="js/components/modal.js"></script>
   <script defer src="js/components/search.js"></script>
@@ -89,7 +89,7 @@
   </div>
 
   <footer class="site-footer">
-    <p>Your visits are saved in this browser only. Park list and establishment years follow the National Park Service designations.</p>
+    <p>Park list and establishment years follow the National Park Service designations.</p>
   </footer>
 
   <!-- Park details dialog -->
@@ -123,12 +123,6 @@
             <dd><ul class="tags" data-field="states"></ul></dd>
           </div>
         </dl>
-
-        <button class="btn park-card__toggle" type="button" data-action="toggle">
-          <svg class="btn__icon btn__icon--mark" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
-          <svg class="btn__icon btn__icon--unmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
-          <span data-field="toggle-label">Mark as visited</span>
-        </button>
 
         <nav class="pager" aria-label="Browse parks">
           <button class="btn btn--ghost" type="button" data-action="prev"><span aria-hidden="true">←</span> Previous</button>

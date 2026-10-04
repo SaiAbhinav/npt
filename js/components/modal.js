@@ -1,6 +1,7 @@
 /**
  * Park dialog — fills the native <dialog> with one park's details,
- * handles the visited toggle and previous/next browsing.
+ * shows the visited stamp and handles previous/next browsing.
+ * Visited status is read-only here; it comes from data/visited.js.
  *
  * Prev / Next cycle through the list passed to open() — the parks matching the
  * current filter — so browsing stays inside what the user is looking at.
@@ -8,7 +9,7 @@
 (function (NPT) {
   'use strict';
 
-  function create(dialog, { parks, store, onClose }) {
+  function create(dialog, { parks, onClose }) {
     const card = dialog.querySelector('.park-card');
     const field = (name) => dialog.querySelector(`[data-field="${name}"]`);
     const refs = {
@@ -19,7 +20,6 @@
       age: field('age'),
       statesLabel: field('states-label'),
       states: field('states'),
-      toggleLabel: field('toggle-label'),
       position: field('position'),
       prev: dialog.querySelector('[data-action="prev"]'),
       next: dialog.querySelector('[data-action="next"]'),
@@ -32,10 +32,9 @@
     function render() {
       const park = current();
       if (!park) return;
-      const visited = store.isVisited(park.id);
       const years = new Date().getFullYear() - park.established;
 
-      card.classList.toggle('is-visited', visited);
+      card.classList.toggle('is-visited', park.visited);
       card.dataset.park = park.id;
 
       if (refs.image.dataset.park !== park.id) {
@@ -76,7 +75,6 @@
         return li;
       }));
 
-      refs.toggleLabel.textContent = visited ? 'Mark as unvisited' : 'Mark as visited';
       refs.position.textContent = `${index + 1} of ${list.length}`;
       const single = list.length < 2;
       refs.prev.disabled = single;
@@ -87,8 +85,6 @@
      * @param {string} id      park to show
      * @param {Array} [browse] parks to cycle through; falls back to all parks
      *                         when omitted or when it doesn't include `id`.
-     *                         It's a snapshot, so marking/unmarking a park while
-     *                         the dialog is open doesn't reshuffle the order.
      */
     function open(id, browse) {
       list = browse && browse.some((p) => p.id === id) ? [...browse] : parks;
@@ -110,7 +106,6 @@
       if (event.target === dialog) return dialog.close();
       const action = event.target.closest('[data-action]')?.dataset.action;
       if (action === 'close') dialog.close();
-      else if (action === 'toggle') store.toggle(current().id);
       else if (action === 'prev') step(-1);
       else if (action === 'next') step(1);
     });
@@ -128,10 +123,7 @@
 
     dialog.addEventListener('close', () => onClose?.(current()?.id));
 
-    return {
-      open,
-      refresh: () => { if (dialog.open) render(); },
-    };
+    return { open };
   }
 
   NPT.ParkModal = Object.freeze({ create });

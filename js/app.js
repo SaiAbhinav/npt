@@ -1,12 +1,14 @@
 /**
- * App — wires the data, store and components together.
+ * App — wires the data and components together.
+ * Visited parks come from data/visited.js; nothing is saved in the browser.
  */
 (function (NPT) {
   'use strict';
 
   function init() {
     const { parks, states } = NPT.data;
-    const { store, utils } = NPT;
+    const { utils } = NPT;
+    const isVisited = (id) => parks.some((p) => p.id === id && p.visited);
     const $ = (selector) => document.querySelector(selector);
 
     // Parks in the 50 states form the big hexagon; territories get their own row.
@@ -32,15 +34,14 @@
     /* Components */
     const modal = NPT.ParkModal.create(els.dialog, {
       parks: ordered,
-      store,
       // Return focus to the tile of the park last shown (it may differ after Prev/Next).
       onClose: (id) => id && boards.forEach((b) => b.has(id) && b.focusTile(id)),
     });
 
     const onSelect = (id) => modal.open(id, browseList);
     const boards = [
-      NPT.Honeycomb.create($('#honeycomb'), stateParks, { isVisited: store.isVisited, onSelect }),
-      NPT.Honeycomb.create($('#territories'), territoryParks, { isVisited: store.isVisited, onSelect, layout: 'row' }),
+      NPT.Honeycomb.create($('#honeycomb'), stateParks, { isVisited, onSelect }),
+      NPT.Honeycomb.create($('#territories'), territoryParks, { isVisited, onSelect, layout: 'row' }),
     ];
 
     const search = NPT.Search.create({
@@ -62,7 +63,7 @@
       const query = filters.query.trim();
       const active = Boolean(query) || filters.status !== 'all';
       const matched = parks.filter((p) =>
-        NPT.Search.matches(p, query) && (filters.status === 'all' || store.isVisited(p.id)));
+        NPT.Search.matches(p, query) && (filters.status === 'all' || p.visited));
       const ids = active ? new Set(matched.map((p) => p.id)) : null;
       browseList = ids ? ordered.filter((p) => ids.has(p.id)) : ordered;
 
@@ -79,7 +80,9 @@
       if (count === 0) {
         return query
           ? `No ${visitedOnly ? 'visited ' : ''}parks match “${escape(query)}”.`
-          : 'No visited parks yet. Open a park and mark it as visited.';
+          : NPT.data.visitedFileOk
+            ? 'No visited parks yet. Add parks to data/visited.js to stamp them.'
+            : 'Couldn’t read data/visited.js. Check it for a missing comma or quote, then reload.';
       }
       return query
         ? `<strong>${count}</strong> ${noun} ${count === 1 ? 'matches' : 'match'} “${escape(query)}”`
@@ -88,21 +91,12 @@
 
     /* Progress */
     function updateProgress() {
-      const visited = store.count();
+      const visited = parks.filter((p) => p.visited).length;
       els.visitedCount.textContent = visited;
       els.bar.setAttribute('aria-valuenow', visited);
       els.bar.setAttribute('aria-valuetext', `${utils.plural(visited, 'park')} of ${total} visited`);
       els.bar.style.setProperty('--progress', `${(visited / total) * 100}%`);
     }
-
-    /* React to visit changes (from the dialog or another tab) */
-    store.subscribe((id) => {
-      const ids = id ? [id] : parks.map((p) => p.id);
-      ids.forEach((pid) => boards.forEach((b) => b.setVisited(pid, store.isVisited(pid))));
-      modal.refresh();
-      updateProgress();
-      if (filters.status !== 'all') applyFilters();
-    });
 
     /* "/" jumps to search */
     document.addEventListener('keydown', (event) => {
