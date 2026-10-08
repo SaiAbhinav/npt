@@ -17,13 +17,17 @@
       region: field('region'),
       name: field('name'),
       established: field('established'),
-      age: field('age'),
       statesLabel: field('states-label'),
       states: field('states'),
       position: field('position'),
+      coords: field('coords'),
+      mapsLink: field('maps-link'),
+      npsLink: field('nps-link'),
       prev: dialog.querySelector('[data-action="prev"]'),
       next: dialog.querySelector('[data-action="next"]'),
     };
+
+    const map = NPT.ParkMap.create(field('map'));
 
     let list = parks; // the parks Prev / Next move through
     let index = -1;
@@ -32,7 +36,6 @@
     function render() {
       const park = current();
       if (!park) return;
-      const years = new Date().getFullYear() - park.established;
 
       card.classList.toggle('is-visited', park.visited);
       card.dataset.park = park.id;
@@ -56,7 +59,6 @@
       refs.region.textContent = park.region;
       refs.name.textContent = park.name;
       refs.established.textContent = park.established;
-      refs.age.textContent = `· ${years} year${years === 1 ? '' : 's'} ago`;
 
       refs.statesLabel.textContent = park.isTerritory
         ? 'Territory'
@@ -74,6 +76,17 @@
         li.append(state);
         return li;
       }));
+
+      map.show(park);
+      refs.coords.textContent = NPT.ParkMap.formatCoords(park.lat, park.lon);
+      refs.mapsLink.href = NPT.ParkMap.mapsUrl(park);
+      refs.mapsLink.setAttribute('aria-label', `Open ${park.name} National Park in Google Maps (new tab)`);
+      const nps = NPT.ParkMap.npsUrl(park);
+      refs.npsLink.hidden = !nps;
+      if (nps) {
+        refs.npsLink.href = nps;
+        refs.npsLink.setAttribute('aria-label', `${park.name} National Park on NPS.gov (new tab)`);
+      }
 
       refs.position.textContent = `${index + 1} of ${list.length}`;
       const single = list.length < 2;

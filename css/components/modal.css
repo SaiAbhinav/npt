@@ -107,47 +107,71 @@
   font-weight: 500;
 }
 
+/* Facts: two labelled values on one line, split by a hairline */
 .facts {
   display: grid;
-  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
 }
 .fact {
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.fact + .fact {
+  margin-left: 18px;
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
 }
 .fact dt {
-  margin-bottom: 6px;
-  font-size: .72rem;
+  font-size: .66rem;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
-.fact__value { font: var(--display-weight) 1.4rem/1 var(--font-display); letter-spacing: var(--display-tracking); }
-.fact__note { color: var(--ink-soft); font-size: .9rem; margin-left: 4px; }
+.fact dd {
+  display: flex;
+  align-items: center;
+  min-height: 24px;     /* same height as a state pill, so both values line up */
+}
+.fact__value {
+  font: var(--display-weight) 1.05rem/1 var(--font-display);
+  letter-spacing: var(--display-tracking);
+  white-space: nowrap;
+}
 
-.tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tags li {
+/* States as small pills */
+.tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tags li,
+.tags .tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px 5px 6px;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px 0 3px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  font-size: .82rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 .tags abbr {
   display: grid; place-items: center;
-  min-width: 26px; height: 22px;
+  min-width: 22px; height: 18px;
   padding: 0 4px;
   border-radius: 999px;
   background: var(--primary);
   color: var(--on-primary);
-  font-size: .68rem;
+  font-size: .6rem;
+  font-weight: 700;
   letter-spacing: .04em;
   text-decoration: none;
+}
+
+@media (max-width: 400px) {
+  .facts { grid-template-columns: 1fr; row-gap: 12px; }
+  .fact + .fact { margin-left: 0; padding-left: 0; border-left: 0; }
 }
 
 /* ---------- Pager ---------- */
@@ -171,4 +195,76 @@
 }
 @keyframes fade-in {
   from { opacity: 0; }
+}
+
+/* ---------- Locator map (shared map styles are in map.css) ---------- */
+.locator {
+  display: grid;
+  gap: 10px;
+}
+
+.park-map {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.park-map[hidden] { display: none; }
+.park-map__detail { transition: opacity .3s ease; }
+.park-map.is-gliding .park-map__detail { opacity: 0; transition: none; }
+
+/* State name, top left, clear of the zoom buttons */
+.park-map__region {
+  position: absolute;
+  top: 9px; left: 11px;
+  max-width: calc(100% - 56px);
+  font: 500 .66rem/1.2 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-shadow: 0 1px 2px var(--bg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.locator__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+.locator__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.locator__coords {
+  font: 500 .78rem/1.2 var(--font-mono);
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.locator__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  font-size: .88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent);
+  text-underline-offset: 3px;
+  transition: color .2s, text-decoration-color .2s;
+}
+.locator__link:hover { color: var(--accent); text-decoration-color: currentColor; }
+.locator__link svg {
+  width: 15px; height: 15px;
+  fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
 }

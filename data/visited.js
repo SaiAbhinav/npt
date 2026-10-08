@@ -9,4 +9,9 @@
  * This is a .js file rather than a .json file because browsers refuse to
  * load .json files into a page opened straight from disk (file://).
  */
-window.NPT_VISITED = ["Acadia", "Shenandoah", "Rocky Mountain", "Great Sand Dunes"];
+window.NPT_VISITED = [
+  "acadia",
+  "shenandoah",
+  "rocky-mountain",
+  "great-sand-dunes"
+];

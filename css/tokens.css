@@ -26,6 +26,8 @@
   --tile-bg: #1d2a23;
   --focus: #f2c14e;
   --tile-hover-border: #8d8e96; /* subtle gray edge on hovered tiles */
+  --map-park: rgb(232 135 90 / .32);  /* park area on the locator map */
+  --map-park-edge: #e8875a;
 
   /* Stamp ink reads like real ink on paper */
   --stamp: #c4352c;

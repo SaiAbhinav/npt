@@ -1,0 +1,16 @@
+{
+  "name": "npt-tools",
+  "private": true,
+  "description": "Build-time helpers for the National Park Tracker. The site itself needs none of this.",
+  "scripts": {
+    "fetch-boundaries": "node fetch-boundaries.cjs",
+    "build-map": "node build-map.cjs"
+  },
+  "dependencies": {
+    "d3-composite-projections": "2.0.0",
+    "d3-geo": "3.1.1",
+    "topojson-client": "3.1.0",
+    "topojson-simplify": "3.0.3",
+    "us-atlas": "3.0.1"
+  }
+}

@@ -1,0 +1,247 @@
+/* ==========================================================================
+   Views — the Honeycomb / List / Map switch, the List view and the Map view.
+   ========================================================================== */
+
+/* ---------- Results line + view switch ---------- */
+.toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 12px;
+  padding-left: 28px;
+}
+.toolbar__row .results { margin: 0; padding: 0; }
+
+/* Each view is its own pill; the active one is filled */
+.view-switch {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.view-switch label { position: relative; }
+.view-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.view-switch > label > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background-color .2s, color .2s, border-color .2s;
+}
+.view-switch > label > span:hover { color: var(--ink); border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); }
+.view-switch svg {
+  width: 15px; height: 15px;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.view-switch input:checked + span {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+.view-switch input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.view[hidden] { display: none; }
+
+@media (max-width: 520px) {
+  .toolbar__row { padding-left: 20px; }
+  .view-switch > label > span { padding: 6px 11px 6px 9px; }
+}
+@media (max-width: 400px) {
+  .view-switch .view-switch__text { display: none; }
+  .view-switch > label > span { padding: 8px 11px; }
+}
+
+/* ---------- List view ---------- */
+.park-list {
+  --cols: 52px minmax(0, 1.6fr) minmax(0, 1.4fr) 6rem 7rem;
+  width: 100%;
+}
+.park-list__head {
+  display: grid;
+  grid-template-columns: var(--cols);
+  gap: 16px;
+  padding: 0 14px 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.park-list__head span:first-child { grid-column: 2; }
+
+.park-rows { display: grid; }
+.park-row { border-bottom: 1px solid var(--line); }
+.park-row[hidden] { display: none; }
+
+.park-row__btn {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+  transition: background-color .15s;
+}
+.park-row__btn:hover { background: var(--surface); }
+.park-row__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+.park-row__thumb {
+  width: 52px;
+  height: 60px;               /* a pointy-top hexagon, like the tiles */
+  clip-path: var(--hex-clip);
+  background: var(--tile-bg) center / cover;
+}
+.park-row:not(.is-visited) .park-row__thumb { filter: brightness(.68) saturate(.75); }
+.park-row__btn:hover .park-row__thumb { filter: none; }
+
+.park-row__main { display: grid; gap: 2px; min-width: 0; }
+.park-row__name {
+  font: var(--display-weight) 1rem/1.2 var(--font-display);
+  letter-spacing: var(--display-tracking);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.park-row__region { font-size: .82rem; color: var(--ink-soft); }
+.park-row__year {
+  font: 500 .86rem/1 var(--font-mono);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.park-row__status { display: flex; justify-content: flex-start; }
+
+@media (max-width: 720px) {
+  .park-list { --cols: 44px minmax(0, 1fr) auto; }
+  .park-list__head { display: none; }
+  .park-row__btn {
+    grid-template-areas: "thumb main status" "thumb states status";
+    grid-template-columns: var(--cols);
+    row-gap: 6px;
+    column-gap: 14px;
+    padding: 10px 6px;
+  }
+  .park-row__thumb { grid-area: thumb; width: 44px; height: 51px; }
+  .park-row__main { grid-area: main; }
+  .park-row__states { grid-area: states; }
+  .park-row__year { display: none; }
+  .park-row__status { grid-area: status; }
+}
+
+/* ---------- Map view ---------- */
+.atlas {
+  width: 100%;
+  aspect-ratio: 960 / 600;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.atlas__missing { padding: 24px; color: var(--ink-soft); }
+.atlas__pins { position: absolute; inset: 0; pointer-events: none; }
+
+.atlas__area { stroke-width: 1; }
+/* Only visited parks are drawn in the accent; the rest stay neutral */
+.atlas__area:not(.is-visited) {
+  fill: color-mix(in srgb, var(--ink) 12%, transparent);
+  stroke: color-mix(in srgb, var(--ink) 38%, transparent);
+}
+.atlas__area.is-dimmed { opacity: .25; }
+
+/* Pins: filled for visited, an open ring for the rest */
+.atlas__pin {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  pointer-events: none;
+}
+.atlas__pin .map-pin__dot {
+  left: -5px; top: -5px;
+  width: 10px; height: 10px;
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--ink-soft), 0 1px 4px rgb(0 0 0 / .6);
+  pointer-events: auto;        /* only the dot is clickable */
+  cursor: pointer;
+  transition: transform .15s var(--ease), opacity .2s;
+}
+.atlas__pin .map-pin__dot::before {   /* a larger, invisible hit area */
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+.atlas__pin.is-visited .map-pin__dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg), 0 1px 5px rgb(0 0 0 / .6);
+}
+.atlas__pin .map-pin__label {
+  left: 11px;
+  padding: 3px 8px;
+  font-size: .72rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .15s;
+}
+.atlas__pin.is-left .map-pin__label { left: auto; right: 11px; }
+.atlas__pin.show-label .map-pin__label,
+.atlas__pin:hover .map-pin__label,
+.atlas__pin:focus-visible .map-pin__label {
+  opacity: 1;
+  visibility: visible;
+}
+.atlas__pin:hover, .atlas__pin:focus-visible { z-index: 2; }
+.atlas__pin:hover .map-pin__dot,
+.atlas__pin:focus-visible .map-pin__dot { transform: scale(1.35); }
+.atlas__pin:focus-visible { outline: none; }
+.atlas__pin:focus-visible .map-pin__dot { box-shadow: 0 0 0 2px var(--focus), 0 1px 5px rgb(0 0 0 / .6); }
+.atlas__pin.is-dimmed .map-pin__dot { opacity: .3; }
+.atlas__pin.is-dimmed:hover .map-pin__dot { opacity: .8; }
+
+.atlas__legend {
+  position: absolute;
+  left: 14px; bottom: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  font-size: .76rem;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.atlas__key {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--ink-soft);
+}
+.atlas__key + span { margin-right: 8px; }
+.atlas__key--visited { background: var(--accent); box-shadow: 0 0 0 2px var(--bg); }
+
+@media (max-width: 640px) {
+  .atlas { border-radius: var(--radius); }
+  .atlas__pin .map-pin__dot { left: -3.5px; top: -3.5px; width: 7px; height: 7px; box-shadow: 0 0 0 1.5px var(--ink-soft); }
+  .atlas__pin.is-visited .map-pin__dot { box-shadow: 0 0 0 1.5px var(--bg); }
+  .atlas__pin .map-pin__label { left: 8px; }
+  .atlas__pin.is-left .map-pin__label { right: 8px; }
+  .atlas__legend { left: 8px; bottom: 8px; padding: 4px 9px; font-size: .7rem; }
+}

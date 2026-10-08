@@ -4,6 +4,17 @@ A static site for tracking visits to all 63 U.S. national parks. Open `index.htm
 directly in a browser. There is no server, build step or install.
 
 ## Features
+- **Three views**, switched under the search bar:
+  - **Honeycomb**: the tiles described below.
+  - **List**: one row per park with its photo, region, states, year and visited stamp.
+  - **Map**: every park on one map of the U.S. (Alaska, Hawaii and the territories
+    in insets), with each park's boundary and a pin: filled for visited parks, an
+    open ring for the rest. Searching zooms to the matching parks and labels them.
+    It zooms and pans like the dialog map.
+
+  Search and the All / Visited switch apply to every view, and Previous / Next in
+  the dialog follows the order of the view you opened it from. The chosen view is
+  kept in the address (`#list`, `#map`), so a reload or a bookmark returns to it.
 - **Honeycomb of parks.** The 61 parks in U.S. states form one large hexagon
   (rows of 5·6·7·8·9·8·7·6·5). The 2 parks in U.S. territories (American Samoa and
   the Virgin Islands) sit in their own row below. On narrow screens the hexagon
@@ -16,6 +27,15 @@ directly in a browser. There is no server, build step or install.
 - **All / Visited switch.** The page opens on **Visited**, so it shows your progress first.
 - **Park dialog** with the photo, region, year established and states. Previous /
   Next (or the arrow keys) move through only the parks that match the current filter.
+- **Park map** in the dialog: the park's actual boundary over the state lines
+  around it, with a pin, the park's name, the state name and a distance scale in
+  miles. Below it are the coordinates and links to the park's **NPS.gov** page and
+  **Google Maps**. Zoom with the + / − buttons, the scroll wheel, a pinch or a
+  double-click; drag to move around; the reset button returns to the park. With
+  the map focused, + − 0 and the arrow keys work too. The map glides between
+  parks as you page through them. It is
+  drawn from data bundled with the site, so it works offline and needs no map
+  service.
 - **Visited stamp** on both the tile and the dialog.
 - **Progress** in the header: "X of 63 visited" and a progress bar.
 - **Visited parks come from a file you edit**, `data/visited.js`. The page has no
@@ -30,6 +50,8 @@ css/
   components/
     header.css          title, visited count, progress bar
     controls.css        search bar and All / Visited switch
+    views.css           view switch, List view, Map view
+    map.css             shared map pieces: shapes, pins, zoom buttons, scale
     honeycomb.css       hexagon tiles, territories row, hover and filter states
     stamp.css           the VISITED stamp
     modal.css           park dialog
@@ -37,12 +59,21 @@ data/
   visited.js            the parks you've visited (edit this)
 js/
   core/utils.js         text normalizing and formatting helpers
-  data/parks.js         the 63 parks
+  core/viewport.js      zoom and pan for the maps (buttons, wheel, drag, pinch, keys)
+  data/parks.js         the 63 parks, with coordinates
+  data/us-map.js        state outlines and park boundaries (generated, see below)
   components/
     honeycomb.js        builds tiles and computes the hexagon layout
     modal.js            park dialog, stamp, Previous / Next
+    park-map.js         the map in the dialog
+    park-list.js        the List view
+    atlas.js            the Map view
     search.js           search matching and the All / Visited switch
   app.js                wires everything together
+tools/                  build scripts for the map (need Node; the site doesn't)
+  fetch-boundaries.cjs  downloads park boundaries into tools/cache/
+  build-map.cjs         regenerates js/data/us-map.js
+  park-list.cjs         reads the park list from js/data/parks.js
 images/
   parks/                park photos (see below)
   placeholder.svg       fallback when a photo is missing
@@ -169,9 +200,36 @@ The originals were resized and recompressed for the web (338MB down to 23MB).
 Keep new photos around these sizes so the page stays fast.
 
 ## Editing park data
-Parks are listed in `js/data/parks.js` as `[name, year established, states, region]`.
+Parks are listed in `js/data/parks.js` as
+`[name, year established, states, region, [latitude, longitude]]`.
 Counts on the page (parks, states, territories) are calculated from this list.
 A park whose only location is a territory is shown in the territories row.
+
+Each park also has an NPS unit code in `NPS_CODES` in the same file. It's used
+for the nps.gov link and to find the park's boundary file.
+
+### Updating the map
+`js/data/us-map.js` is generated from the park list. After changing a park's
+coordinates, states or code, rebuild it:
+
+```sh
+cd tools
+npm install
+npm run fetch-boundaries   # first time only; saves to tools/cache/
+npm run build-map
+```
+
+The build stops with an error if a park can't be placed. Each map is framed on
+the park's boundary, and the pin sits at the park's coordinates. If those fall
+outside the boundary, as with parks split into separate sections, the pin
+moves onto the park and the build prints a note.
+
+Sources:
+- Park boundaries: National Park Service, from
+  [nationalparkservice/data](https://github.com/nationalparkservice/data). Most
+  were last edited in 2010–2013, so recent boundary changes may be missing.
+- State outlines: [us-atlas](https://github.com/topojson/us-atlas), built from
+  U.S. Census Bureau cartographic boundary files.
 
 Establishment years are the year each site first became a national park. A few
 have nuances worth knowing if you need precision: Acadia (1919, as Lafayette NP),
@@ -180,5 +238,7 @@ of Hawaii NP; separate park in 1961).
 
 ## Versions
 - **v1** (git tag `v1`): placeholder images, dark theme, Unbounded + Manrope.
-- **Current:** v1 plus real park photos; visited parks are read from
-  `data/visited.js` instead of being saved in the browser.
+- **v2** (git tag `v2`): real park photos; visited parks read from
+  `data/visited.js` instead of being saved in the browser; a zoomable map of each
+  park's boundary in the dialog, with NPS.gov and Google Maps links; compact
+  dialog facts.

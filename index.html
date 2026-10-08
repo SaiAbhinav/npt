@@ -20,6 +20,8 @@
   <link rel="stylesheet" href="css/components/controls.css">
   <link rel="stylesheet" href="css/components/honeycomb.css">
   <link rel="stylesheet" href="css/components/stamp.css">
+  <link rel="stylesheet" href="css/components/map.css">
+  <link rel="stylesheet" href="css/components/views.css">
   <link rel="stylesheet" href="css/components/modal.css">
 
   <!--
@@ -29,9 +31,14 @@
   -->
   <script defer src="data/visited.js"></script>
   <script defer src="js/core/utils.js"></script>
+  <script defer src="js/core/viewport.js"></script>
   <script defer src="js/data/parks.js"></script>
+  <script defer src="js/data/us-map.js"></script>
   <script defer src="js/components/honeycomb.js"></script>
+  <script defer src="js/components/park-map.js"></script>
   <script defer src="js/components/modal.js"></script>
+  <script defer src="js/components/park-list.js"></script>
+  <script defer src="js/components/atlas.js"></script>
   <script defer src="js/components/search.js"></script>
   <script defer src="js/app.js"></script>
 </head>
@@ -71,19 +78,46 @@
           </fieldset>
         </div>
         <datalist id="search-suggestions"></datalist>
-        <p class="results" id="results" aria-live="polite"></p>
+        <div class="toolbar__row">
+          <p class="results" id="results" aria-live="polite"></p>
+          <fieldset class="view-switch">
+            <legend class="visually-hidden">View</legend>
+            <label><input type="radio" name="view" value="honeycomb" checked><span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.2 7.25v9.5L12 21.5l-8.2-4.75v-9.5Z"/></svg>
+              <span class="view-switch__text">Honeycomb</span></span></label>
+            <label><input type="radio" name="view" value="list"><span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>
+              <span class="view-switch__text">List</span></span></label>
+            <label><input type="radio" name="view" value="map"><span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg>
+              <span class="view-switch__text">Map</span></span></label>
+          </fieldset>
+        </div>
       </section>
 
       <section class="board" id="parks" aria-label="National parks">
-        <ul class="honeycomb" id="honeycomb" aria-label="National parks in U.S. states"></ul>
+        <div class="view" data-view="honeycomb">
+          <ul class="honeycomb" id="honeycomb" aria-label="National parks in U.S. states"></ul>
 
-        <section class="territories" aria-labelledby="territories-title">
-          <div class="territories__head">
-            <h2 id="territories-title">U.S. Territories</h2>
-            <span id="territories-count">2 parks</span>
+          <section class="territories" aria-labelledby="territories-title">
+            <div class="territories__head">
+              <h2 id="territories-title">U.S. Territories</h2>
+              <span id="territories-count">2 parks</span>
+            </div>
+            <ul class="honeycomb" id="territories" aria-label="National parks in U.S. territories"></ul>
+          </section>
+        </div>
+
+        <div class="view park-list" data-view="list" hidden>
+          <div class="park-list__head" aria-hidden="true">
+            <span>Park</span><span>State</span><span>Established</span><span></span>
           </div>
-          <ul class="honeycomb" id="territories" aria-label="National parks in U.S. territories"></ul>
-        </section>
+          <ul class="park-rows" id="park-list" aria-label="National parks"></ul>
+        </div>
+
+        <div class="view" data-view="map" hidden>
+          <div class="atlas" id="atlas"></div>
+        </div>
       </section>
     </main>
   </div>
@@ -116,13 +150,31 @@
         <dl class="facts">
           <div class="fact">
             <dt>Established</dt>
-            <dd><span class="fact__value" data-field="established"></span> <span class="fact__note" data-field="age"></span></dd>
+            <dd><span class="fact__value" data-field="established"></span></dd>
           </div>
           <div class="fact">
             <dt data-field="states-label">State</dt>
             <dd><ul class="tags" data-field="states"></ul></dd>
           </div>
         </dl>
+
+        <section class="locator" aria-labelledby="locator-title">
+          <h3 class="visually-hidden" id="locator-title">Location</h3>
+          <div class="park-map" data-field="map"></div>
+          <div class="locator__meta">
+            <span class="locator__coords" data-field="coords"></span>
+            <span class="locator__links">
+              <a class="locator__link" data-field="nps-link" href="https://www.nps.gov" target="_blank" rel="noopener noreferrer">
+                NPS.gov
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+              <a class="locator__link" data-field="maps-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                Google Maps
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            </span>
+          </div>
+        </section>
 
         <nav class="pager" aria-label="Browse parks">
           <button class="btn btn--ghost" type="button" data-action="prev"><span aria-hidden="true">←</span> Previous</button>

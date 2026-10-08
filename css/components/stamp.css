@@ -27,7 +27,19 @@
 
 /* Stamps only show once the park is visited */
 .hex-tile:not(.is-visited) .stamp,
-.park-card:not(.is-visited) .stamp { display: none; }
+.park-card:not(.is-visited) .stamp,
+.park-row:not(.is-visited) .stamp { display: none; }
+
+/* In a list row: small and inline */
+.stamp--row {
+  position: relative;
+  --stamp-size: 9px;
+  padding: .55em .8em .5em;
+  letter-spacing: .1em;
+  outline-offset: -.36em;
+  rotate: -6deg;
+  box-shadow: none;
+}
 
 /* On a tile: small, centered in the upper half of the hexagon */
 .stamp--tile {

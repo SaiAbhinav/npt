@@ -14,8 +14,11 @@
     // Parks in the 50 states form the big hexagon; territories get their own row.
     const stateParks = parks.filter((p) => !p.isTerritory);
     const territoryParks = parks.filter((p) => p.isTerritory);
-    const ordered = [...stateParks, ...territoryParks]; // display order, used for Prev / Next
+    const ordered = [...stateParks, ...territoryParks]; // honeycomb order
     const total = parks.length;
+    // Prev / Next follow the order of whichever view is showing.
+    const ORDER = { honeycomb: ordered, list: parks, map: parks };
+    const VIEWS = Object.keys(ORDER);
 
     const els = {
       statsLine: $('#stats-line'),
@@ -29,20 +32,30 @@
     };
 
     let filters = { query: '', status: 'all' };
-    let browseList = ordered; // parks matching the current filter, in display order
+    let matchIds = null;       // Set of matching park ids, or null when nothing is filtered
+    let view = 'honeycomb';
+
+    const browseList = () => (matchIds ? ORDER[view].filter((p) => matchIds.has(p.id)) : ORDER[view]);
 
     /* Components */
     const modal = NPT.ParkModal.create(els.dialog, {
       parks: ordered,
-      // Return focus to the tile of the park last shown (it may differ after Prev/Next).
-      onClose: (id) => id && boards.forEach((b) => b.has(id) && b.focusTile(id)),
+      // Return focus to where the park was opened from (it may differ after Prev/Next).
+      onClose: (id) => {
+        if (!id) return;
+        if (view === 'honeycomb') boards.forEach((b) => b.has(id) && b.focusTile(id));
+        else if (view === 'list') list.focusItem(id);
+        else atlas.focusItem(id);
+      },
     });
 
-    const onSelect = (id) => modal.open(id, browseList);
+    const onSelect = (id) => modal.open(id, browseList());
     const boards = [
       NPT.Honeycomb.create($('#honeycomb'), stateParks, { isVisited, onSelect }),
       NPT.Honeycomb.create($('#territories'), territoryParks, { isVisited, onSelect, layout: 'row' }),
     ];
+    const list = NPT.ParkList.create($('#park-list'), parks, { onSelect });
+    const atlas = NPT.Atlas.create($('#atlas'), parks, { onSelect });
 
     const search = NPT.Search.create({
       input: els.search,
@@ -64,12 +77,35 @@
       const active = Boolean(query) || filters.status !== 'all';
       const matched = parks.filter((p) =>
         NPT.Search.matches(p, query) && (filters.status === 'all' || p.visited));
-      const ids = active ? new Set(matched.map((p) => p.id)) : null;
-      browseList = ids ? ordered.filter((p) => ids.has(p.id)) : ordered;
+      matchIds = active ? new Set(matched.map((p) => p.id)) : null;
 
-      boards.forEach((b) => b.applyFilter(ids));
+      boards.forEach((b) => b.applyFilter(matchIds));
+      list.applyFilter(matchIds);
+      atlas.applyFilter(matchIds, query);
       els.results.innerHTML = describe(matched.length, query);
     }
+
+    /* Views: Honeycomb / List / Map. The choice lives in the address
+       (#list, #map) so a reload keeps it, without saving anything. */
+    const viewInputs = document.querySelectorAll('input[name="view"]');
+    const viewPanels = document.querySelectorAll('[data-view]');
+
+    function setView(next, { updateUrl = true } = {}) {
+      view = VIEWS.includes(next) ? next : 'honeycomb';
+      viewPanels.forEach((panel) => { panel.hidden = panel.dataset.view !== view; });
+      viewInputs.forEach((input) => { input.checked = input.value === view; });
+      if (view === 'map') atlas.activate();
+      if (updateUrl) {
+        const hash = view === 'honeycomb' ? '' : `#${view}`;
+        if (location.hash !== hash) history.replaceState(null, '', hash || location.pathname + location.search);
+      }
+    }
+
+    viewInputs.forEach((input) => input.addEventListener('change', () => input.checked && setView(input.value)));
+    window.addEventListener('hashchange', () => {
+      const hash = location.hash.slice(1);
+      if (hash === '' || VIEWS.includes(hash)) setView(hash, { updateUrl: false }); // ignore #parks etc.
+    });
 
     function describe(count, query) {
       const escape = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -121,6 +157,7 @@
 
     updateProgress();
     applyFilters();
+    setView(location.hash.slice(1), { updateUrl: false });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

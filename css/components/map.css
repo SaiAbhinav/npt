@@ -1,0 +1,160 @@
+/* ==========================================================================
+   Map — shared pieces for the dialog map and the map view: the zoomable
+   surface, state and park shapes, zoom buttons, pins and the distance scale.
+   ========================================================================== */
+.map-surface {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 0) 0 0 / 14px 14px,
+    var(--bg);
+  cursor: grab;
+  touch-action: none;           /* the map handles drag and pinch itself */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.map-surface.is-dragging { cursor: grabbing; }
+.map-surface:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-state {
+  fill: var(--surface-2);
+  stroke: var(--bg);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* A park's own boundary */
+.map-area {
+  fill: var(--map-park);
+  fill-rule: nonzero; /* overlapping pieces (e.g. land + lake waters) fill as one */
+  stroke: var(--map-park-edge);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- Zoom buttons ---------- */
+.map-controls {
+  position: absolute;
+  top: 8px; right: 8px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: default;
+}
+.map-btn {
+  display: grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  color: var(--ink);
+  transition: background-color .15s, opacity .15s;
+}
+.map-btn:hover:not(:disabled) { background: var(--surface-2); }
+.map-btn:disabled { opacity: .35; cursor: default; }
+.map-btn[hidden] { display: none; }
+.map-btn svg {
+  width: 15px; height: 15px;
+  fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ---------- Distance scale, bottom left ---------- */
+.map-scale {
+  position: absolute;
+  left: 11px; right: 50%;
+  bottom: 9px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.map-scale__bar {
+  height: 5px;
+  border: 1.5px solid var(--ink-soft);
+  border-top: 0;
+  flex: none;
+}
+.map-scale__text {
+  font: 500 .66rem/1 var(--font-mono);
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+  text-shadow: 0 1px 2px var(--bg);
+  white-space: nowrap;
+}
+
+/* ---------- Pin: a dot at the exact point, with a name label ---------- */
+.map-pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.map-pin.is-offscreen { visibility: hidden; }
+.map-pin__dot {
+  position: absolute;
+  left: -6px; top: -6px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--bg), 0 2px 8px rgb(0 0 0 / .6);
+}
+.park-map__pin .map-pin__dot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: pin-pulse 2.4s ease-out 0.5s infinite;
+}
+.map-pin__label {
+  position: absolute;
+  top: 0;
+  left: 14px;
+  translate: 0 -50%;
+  max-width: 13em;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  font-size: .76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+.map-pin.is-left .map-pin__label {
+  left: auto;
+  right: 14px;
+}
+.map-pin.is-dropping .map-pin__dot { animation: pin-drop .45s var(--ease-spring); }
+.map-pin.is-dropping .map-pin__label { animation: map-fade-in .4s ease .15s backwards; }
+
+@keyframes pin-drop {
+  0%   { translate: 0 -18px; opacity: 0; }
+  60%  { translate: 0 2px; opacity: 1; }
+  100% { translate: 0 0; }
+}
+@keyframes pin-pulse {
+  0%   { opacity: .8; scale: .6; }
+  80%, 100% { opacity: 0; scale: 1.8; }
+}
+@keyframes map-fade-in {
+  from { opacity: 0; }
+}
