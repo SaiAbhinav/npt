@@ -8,16 +8,15 @@
   function init() {
     const { parks, states } = NPT.data;
     const { utils } = NPT;
-    const isVisited = (id) => parks.some((p) => p.id === id && p.visited);
     const $ = (selector) => document.querySelector(selector);
 
-    // Parks in the 50 states form the big hexagon; territories get their own row.
+    // The passport lists parks in states first, then the territories.
     const stateParks = parks.filter((p) => !p.isTerritory);
     const territoryParks = parks.filter((p) => p.isTerritory);
-    const ordered = [...stateParks, ...territoryParks]; // honeycomb order
+    const ordered = [...stateParks, ...territoryParks];
     const total = parks.length;
     // Prev / Next follow the order of whichever view is showing.
-    const ORDER = { honeycomb: ordered, list: parks, map: parks };
+    const ORDER = { passport: ordered, list: parks, map: parks };
     const VIEWS = Object.keys(ORDER);
 
     const els = {
@@ -28,12 +27,11 @@
       results: $('#results'),
       search: $('#park-search'),
       dialog: $('#park-dialog'),
-      territoriesCount: $('#territories-count'),
     };
 
     let filters = { query: '', status: 'all' };
     let matchIds = null;       // Set of matching park ids, or null when nothing is filtered
-    let view = 'honeycomb';
+    let view = 'passport';
 
     const browseList = () => (matchIds ? ORDER[view].filter((p) => matchIds.has(p.id)) : ORDER[view]);
 
@@ -43,17 +41,14 @@
       // Return focus to where the park was opened from (it may differ after Prev/Next).
       onClose: (id) => {
         if (!id) return;
-        if (view === 'honeycomb') boards.forEach((b) => b.has(id) && b.focusTile(id));
+        if (view === 'passport') passport.focusItem(id);
         else if (view === 'list') list.focusItem(id);
         else atlas.focusItem(id);
       },
     });
 
     const onSelect = (id) => modal.open(id, browseList());
-    const boards = [
-      NPT.Honeycomb.create($('#honeycomb'), stateParks, { isVisited, onSelect }),
-      NPT.Honeycomb.create($('#territories'), territoryParks, { isVisited, onSelect, layout: 'row' }),
-    ];
+    const passport = NPT.Passport.create($('#passport'), ordered, { onSelect });
     const list = NPT.ParkList.create($('#park-list'), parks, { onSelect });
     const atlas = NPT.Atlas.create($('#atlas'), parks, { onSelect });
 
@@ -79,24 +74,24 @@
         NPT.Search.matches(p, query) && (filters.status === 'all' || p.visited));
       matchIds = active ? new Set(matched.map((p) => p.id)) : null;
 
-      boards.forEach((b) => b.applyFilter(matchIds));
+      passport.applyFilter(matchIds);
       list.applyFilter(matchIds);
       atlas.applyFilter(matchIds, query);
       els.results.innerHTML = describe(matched.length, query);
     }
 
-    /* Views: Honeycomb / List / Map. The choice lives in the address
+    /* Views: Passport / List / Map. The choice lives in the address
        (#list, #map) so a reload keeps it, without saving anything. */
     const viewInputs = document.querySelectorAll('input[name="view"]');
     const viewPanels = document.querySelectorAll('[data-view]');
 
     function setView(next, { updateUrl = true } = {}) {
-      view = VIEWS.includes(next) ? next : 'honeycomb';
+      view = VIEWS.includes(next) ? next : 'passport';
       viewPanels.forEach((panel) => { panel.hidden = panel.dataset.view !== view; });
       viewInputs.forEach((input) => { input.checked = input.value === view; });
       if (view === 'map') atlas.activate();
       if (updateUrl) {
-        const hash = view === 'honeycomb' ? '' : `#${view}`;
+        const hash = view === 'passport' ? '' : `#${view}`;
         if (location.hash !== hash) history.replaceState(null, '', hash || location.pathname + location.search);
       }
     }
@@ -151,7 +146,6 @@
       utils.plural(stateCount, 'state'),
       territoryCount === 1 ? '1 territory' : `${territoryCount} territories`,
     ].join(' · ');
-    els.territoriesCount.textContent = utils.plural(territoryParks.length, 'park');
     els.totalCount.textContent = total;
     els.bar.setAttribute('aria-valuemax', total);
 

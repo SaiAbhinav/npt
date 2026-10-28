@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Passport — each park as a passport entry: round photo, name, state, year,
+   and the VISITED stamp once you've been.
+   ========================================================================== */
+.board { margin-top: 24px; }
+
+.passport {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 148px), 1fr));
+  gap: 12px;
+}
+
+.pp { display: grid; transition: opacity .3s; }
+.pp.is-dimmed { opacity: .3; }
+.pp.is-dimmed:hover, .pp.is-dimmed:focus-within { opacity: .8; }
+
+.pp__btn {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+  width: 100%;
+  padding: 18px 12px 16px;
+  border: 1.5px dashed color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: 16px;
+  background: var(--surface);
+  text-align: center;
+  transition: border-color .2s, background-color .2s, transform .2s var(--ease);
+}
+.pp__btn:hover {
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 60%, var(--surface));
+}
+.pp__btn:active { transform: scale(.98); }
+.pp__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.pp__photo {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--tile-bg) center / cover;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 4.5px color-mix(in srgb, var(--ink) 22%, transparent);
+  transition: filter .25s;
+}
+.pp:not(.is-visited) .pp__photo { filter: brightness(.68) saturate(.7); }
+.pp__btn:hover .pp__photo, .pp__btn:focus-visible .pp__photo { filter: none; }
+
+.pp__name {
+  margin-top: 4px;
+  font: var(--display-weight) .86rem/1.2 var(--font-display);
+  letter-spacing: var(--display-tracking);
+  text-wrap: balance;
+}
+.pp__meta {
+  font: 500 .66rem/1.3 var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.pp__new {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  color: #111;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 400px) {
+  .passport { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .pp__photo { width: 72px; height: 72px; }
+}

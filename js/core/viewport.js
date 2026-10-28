@@ -156,7 +156,7 @@
     }, { passive: false });
 
     el.addEventListener('dblclick', (event) => {
-      if (event.target.closest('.map-controls, button, a')) return;
+      if (event.target.closest('.map-controls, .map-ui, button, a')) return;
       const [fx, fy] = fraction(event);
       zoomBy(event.shiftKey ? 1 / ZOOM_STEP : ZOOM_STEP, fx, fy, ZOOM_MS);
     });
@@ -167,7 +167,7 @@
     let pinch = null;
     let dragged = false;
     el.addEventListener('pointerdown', (event) => {
-      if (event.target.closest('.map-controls') || !view) return;
+      if (event.target.closest('.map-controls, .map-ui') || !view) return;
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       pointers.set(event.pointerId, { start: [event.clientX, event.clientY], last: [event.clientX, event.clientY] });
       dragged = false;

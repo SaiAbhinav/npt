@@ -26,9 +26,22 @@
 }
 
 /* Stamps only show once the park is visited */
-.hex-tile:not(.is-visited) .stamp,
+.pp:not(.is-visited) .stamp,
+.map-tile:not(.is-visited) .stamp,
 .park-card:not(.is-visited) .stamp,
 .park-row:not(.is-visited) .stamp { display: none; }
+
+/* On a passport entry: over the photo's top-right edge */
+.stamp--passport {
+  --stamp-size: 11px;
+  top: 14px;
+  right: 6px;
+  padding: .55em .8em .5em;
+  letter-spacing: .1em;
+  outline-offset: -.36em;
+  rotate: 10deg;
+  box-shadow: 0 4px 10px -4px rgb(0 0 0 / .5);
+}
 
 /* In a list row: small and inline */
 .stamp--row {
@@ -41,7 +54,7 @@
   box-shadow: none;
 }
 
-/* On a tile: small, centered in the upper half of the hexagon */
+/* On a map tile: small, centered in the upper half of the hexagon */
 .stamp--tile {
   --stamp-size: clamp(6.5px, calc(var(--tile-w) * 0.075), 11px);
   top: 22%;

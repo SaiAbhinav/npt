@@ -1,5 +1,5 @@
 /**
- * The 63 U.S. national parks.
+ * The 64 U.S. national parks.
  * Each row: [name, year established as a national park, states/territories, region,
  *            [latitude, longitude] of the park's center, used to pin it on the map]
  *
@@ -41,6 +41,7 @@
     'capitol-reef': 'care',
     'carlsbad-caverns': 'cave',
     'channel-islands': 'chis',
+    'chiricahua': 'chir',
     'congaree': 'cong',
     'crater-lake': 'crla',
     'cuyahoga-valley': 'cuva',
@@ -114,6 +115,7 @@
     ['Capitol Reef', 1971, ['Utah'], 'Southwest', [38.2, -111.17]],
     ['Carlsbad Caverns', 1930, ['New Mexico'], 'Southwest', [32.17, -104.44]],
     ['Channel Islands', 1980, ['California'], 'Pacific West', [34.01, -119.42]],
+    ['Chiricahua', 2026, ['Arizona'], 'Southwest', [32.01, -109.35]],
     ['Congaree', 2003, ['South Carolina'], 'Southeast', [33.78, -80.78]],
     ['Crater Lake', 1902, ['Oregon'], 'Pacific West', [42.94, -122.1]],
     ['Cuyahoga Valley', 2000, ['Ohio'], 'Midwest', [41.24, -81.55]],

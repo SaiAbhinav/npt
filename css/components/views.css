@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Views — the Honeycomb / List / Map switch, the List view and the Map view.
+   Views — the Passport / List / Map switch, the List view and the Map view.
+   (The Passport view has its own file, passport.css.)
    ========================================================================== */
 
 /* ---------- Results line + view switch ---------- */
@@ -237,8 +238,118 @@
 .atlas__key + span { margin-right: 8px; }
 .atlas__key--visited { background: var(--accent); box-shadow: 0 0 0 2px var(--bg); }
 
+/* ---------- Map view: Tiles / Pins ---------- */
+.atlas[data-mode="tiles"] .atlas__pins,
+.atlas[data-mode="tiles"] .atlas__areas,
+.atlas[data-mode="pins"] .atlas__tiles { display: none; }
+.atlas[data-mode="tiles"] .map-state { fill: color-mix(in srgb, var(--surface-2) 70%, var(--bg)); }
+
+.atlas__mode {
+  position: absolute;
+  top: 10px; left: 10px;
+  z-index: 3;
+  display: inline-flex;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  cursor: default;
+}
+.atlas__mode label { position: relative; }
+.atlas__mode input { position: absolute; opacity: 0; pointer-events: none; }
+.atlas__mode span {
+  display: block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: .76rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.atlas__mode span:hover { color: var(--ink); }
+.atlas__mode input:checked + span { background: var(--primary); color: var(--on-primary); }
+.atlas__mode input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Hex tiles, centred on their grid cell; --w is set by atlas.js from the zoom */
+.atlas__tiles { position: absolute; inset: 0; pointer-events: none; }
+.map-tile {
+  position: absolute;
+  width: var(--w);
+  height: calc(var(--w) * 1.1547);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  translate: -50% -50%;
+  pointer-events: auto;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / .4));
+}
+.map-tile:hover, .map-tile:focus-visible { z-index: 2; }
+.map-tile:hover {
+  filter: drop-shadow(1.5px 0 0 var(--tile-hover-border)) drop-shadow(-1.5px 0 0 var(--tile-hover-border))
+          drop-shadow(0 1.5px 0 var(--tile-hover-border)) drop-shadow(0 -1.5px 0 var(--tile-hover-border));
+}
+.map-tile:focus-visible {
+  outline: none;
+  filter: drop-shadow(2px 0 0 var(--focus)) drop-shadow(-2px 0 0 var(--focus))
+          drop-shadow(0 2px 0 var(--focus)) drop-shadow(0 -2px 0 var(--focus));
+}
+.map-tile__hex {
+  position: absolute;
+  inset: 0;
+  clip-path: var(--hex-clip);
+  background: var(--tile-bg) center / cover;
+  transition: transform .25s var(--ease), filter .25s;
+}
+.map-tile__hex::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(10 22 16 / 0) 30%, rgb(10 22 16 / .55) 52%, rgb(10 22 16 / .85) 100%);
+}
+.map-tile:hover .map-tile__hex { transform: scale(1.08); }
+.map-tile:not(.is-visited) .map-tile__hex { filter: brightness(.68) saturate(.75); }
+.map-tile:hover .map-tile__hex, .map-tile:focus-visible .map-tile__hex { filter: none; }
+.map-tile__name {
+  position: absolute;
+  z-index: 1;
+  left: 12%; right: 12%;
+  top: 54%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-align: center;
+  font: 700 clamp(7px, calc(var(--w) * .11), 15px)/1.12 var(--font-body);
+  text-shadow: 0 1px 3px rgb(0 0 0 / .6);
+}
+.map-tile .stamp--tile { --stamp-size: clamp(5px, calc(var(--w) * .075), 11px); }
+/* Small tiles: the name appears as a label under the tile on hover */
+.atlas__tiles.is-small .map-tile__name { display: none; }
+.atlas__tiles.is-small .map-tile:hover .map-tile__name,
+.atlas__tiles.is-small .map-tile:focus-visible .map-tile__name {
+  display: block;
+  top: calc(100% + 4px);
+  left: 50%; right: auto;
+  translate: -50% 0;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: .72rem;
+  white-space: nowrap;
+  text-shadow: none;
+}
+.atlas__tiles.is-tiny .stamp { display: none; }
+.map-tile.is-dimmed .map-tile__hex { opacity: .22; filter: grayscale(1); }
+.map-tile.is-dimmed .stamp { opacity: .3; }
+.map-tile.is-dimmed:hover .map-tile__hex { opacity: .6; }
+
 @media (max-width: 640px) {
   .atlas { border-radius: var(--radius); }
+  .atlas__mode { top: 6px; left: 6px; }
+  .atlas__mode span { padding: 3px 9px; font-size: .7rem; }
   .atlas__pin .map-pin__dot { left: -3.5px; top: -3.5px; width: 7px; height: 7px; box-shadow: 0 0 0 1.5px var(--ink-soft); }
   .atlas__pin.is-visited .map-pin__dot { box-shadow: 0 0 0 1.5px var(--bg); }
   .atlas__pin .map-pin__label { left: 8px; }

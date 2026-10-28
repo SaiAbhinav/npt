@@ -1,43 +1,41 @@
 # National Park Tracker
 
-A static site for tracking visits to all 63 U.S. national parks. Open `index.html`
+A static site for tracking visits to all 64 U.S. national parks. Open `index.html`
 directly in a browser. There is no server, build step or install.
 
 ## Features
 - **Three views**, switched under the search bar:
-  - **Honeycomb**: the tiles described below.
+  - **Passport** (the default): every park as a passport entry with a round
+    photo, its state and year established. Visited parks get the red VISITED
+    stamp. Parks outside the current filter fade.
   - **List**: one row per park with its photo, region, states, year and visited stamp.
-  - **Map**: every park on one map of the U.S. (Alaska, Hawaii and the territories
-    in insets), with each park's boundary and a pin: filled for visited parks, an
-    open ring for the rest. Searching zooms to the matching parks and labels them.
-    It zooms and pans like the dialog map.
+  - **Map**: every park on one map of the U.S., with Alaska, Hawaii and the
+    territories in insets. A **Tiles / Pins** switch in the map's corner picks how
+    parks show:
+    - **Tiles**: each park's photo tile on a hex grid, as close to the park's real
+      location as the grid allows. Tiles grow as you zoom in and show names once
+      there's room.
+    - **Pins**: each park's boundary and a pin at its real location, filled for
+      visited parks and an open ring for the rest.
+
+    Searching zooms the map to the matching parks. Zoom with the + / − buttons,
+    the scroll wheel, a pinch or a double-click, and drag to move around.
 
   Search and the All / Visited switch apply to every view, and Previous / Next in
   the dialog follows the order of the view you opened it from. The chosen view is
   kept in the address (`#list`, `#map`), so a reload or a bookmark returns to it.
-- **Honeycomb of parks.** The 61 parks in U.S. states form one large hexagon
-  (rows of 5·6·7·8·9·8·7·6·5). The 2 parks in U.S. territories (American Samoa and
-  the Virgin Islands) sit in their own row below. On narrow screens the hexagon
-  becomes a centered honeycomb so tiles stay readable.
-- **Park photos.** Each tile shows the park's photo with its name on an overlay.
-  Unvisited parks are slightly darker; hovering brightens them and adds a thin border.
-- **Search** by park name, state (`Utah`, or a code like `UT`) or region (`Southwest`).
-  Non-matching tiles fade instead of disappearing, so the honeycomb keeps its shape.
-  Press `/` to jump to the search field.
+- **Search** by park name, state (`Utah`, or a code like `UT`) or region
+  (`Southwest`). Press `/` to jump to the search field.
 - **All / Visited switch.** The page opens on **Visited**, so it shows your progress first.
 - **Park dialog** with the photo, region, year established and states. Previous /
   Next (or the arrow keys) move through only the parks that match the current filter.
 - **Park map** in the dialog: the park's actual boundary over the state lines
   around it, with a pin, the park's name, the state name and a distance scale in
   miles. Below it are the coordinates and links to the park's **NPS.gov** page and
-  **Google Maps**. Zoom with the + / − buttons, the scroll wheel, a pinch or a
-  double-click; drag to move around; the reset button returns to the park. With
-  the map focused, + − 0 and the arrow keys work too. The map glides between
-  parks as you page through them. It is
-  drawn from data bundled with the site, so it works offline and needs no map
-  service.
-- **Visited stamp** on both the tile and the dialog.
-- **Progress** in the header: "X of 63 visited" and a progress bar.
+  **Google Maps**. It zooms and pans like the Map view, and glides between parks as
+  you page through them. All map data is bundled with the site, so it works
+  offline and needs no map service.
+- **Progress** in the header: "X of 64 visited" and a progress bar.
 - **Visited parks come from a file you edit**, `data/visited.js`. The page has no
   buttons for marking parks and saves nothing in the browser.
 
@@ -50,9 +48,9 @@ css/
   components/
     header.css          title, visited count, progress bar
     controls.css        search bar and All / Visited switch
-    views.css           view switch, List view, Map view
+    views.css           view switch, List view, Map view (tiles and pins)
     map.css             shared map pieces: shapes, pins, zoom buttons, scale
-    honeycomb.css       hexagon tiles, territories row, hover and filter states
+    passport.css        the Passport view
     stamp.css           the VISITED stamp
     modal.css           park dialog
 data/
@@ -60,14 +58,14 @@ data/
 js/
   core/utils.js         text normalizing and formatting helpers
   core/viewport.js      zoom and pan for the maps (buttons, wheel, drag, pinch, keys)
-  data/parks.js         the 63 parks, with coordinates
+  data/parks.js         the 64 parks, with coordinates
   data/us-map.js        state outlines and park boundaries (generated, see below)
   components/
-    honeycomb.js        builds tiles and computes the hexagon layout
+    passport.js         the Passport view
     modal.js            park dialog, stamp, Previous / Next
     park-map.js         the map in the dialog
     park-list.js        the List view
-    atlas.js            the Map view
+    atlas.js            the Map view, including the hex-tile layout
     search.js           search matching and the All / Visited switch
   app.js                wires everything together
 tools/                  build scripts for the map (need Node; the site doesn't)
@@ -108,7 +106,7 @@ The file is `.js` rather than `.json` because browsers refuse to load `.json` fi
 into a page opened straight from disk. The list inside it uses JSON syntax.
 
 <details>
-<summary>All 63 park ids</summary>
+<summary>All 64 park ids</summary>
 
 | Park | Id |
 | --- | --- |
@@ -124,6 +122,7 @@ into a page opened straight from disk. The list inside it uses JSON syntax.
 | Capitol Reef | `capitol-reef` |
 | Carlsbad Caverns | `carlsbad-caverns` |
 | Channel Islands | `channel-islands` |
+| Chiricahua | `chiricahua` |
 | Congaree | `congaree` |
 | Crater Lake | `crater-lake` |
 | Cuyahoga Valley | `cuyahoga-valley` |
@@ -231,7 +230,7 @@ Sources:
 - State outlines: [us-atlas](https://github.com/topojson/us-atlas), built from
   U.S. Census Bureau cartographic boundary files.
 
-Establishment years are the year each site first became a national park. A few
+Establishment years are the year each site first became a national park. Chiricahua, the newest, became one on October 20, 2026 (it was a national monument from 1924). A few
 have nuances worth knowing if you need precision: Acadia (1919, as Lafayette NP),
 Everglades and Guadalupe Mountains (year authorized), and Haleakalā (1916 as part
 of Hawaii NP; separate park in 1961).
@@ -242,3 +241,5 @@ of Hawaii NP; separate park in 1961).
   `data/visited.js` instead of being saved in the browser; a zoomable map of each
   park's boundary in the dialog, with NPS.gov and Google Maps links; compact
   dialog facts.
+- **Current:** Chiricahua added as the 64th park; the honeycomb is replaced by the
+  Passport view; the Map view gains hex photo tiles alongside pins.
